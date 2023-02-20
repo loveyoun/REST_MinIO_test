@@ -42,48 +42,56 @@ public class UploadController {
 
     @PostMapping
     //public String upload(@RequestParam("file") MultipartFile file, RedirectAttributes redirectAttributes){
-    public void uploadFile(@RequestParam("file") MultipartFile[] files){
+    public String uploadFile(@RequestParam("file") MultipartFile file){
         /*redirectAttributes.addFlashAttribute("message", "You successfully uploaded" + file.getOriginalFilename());
         return "redirect:/";*/
-        for(MultipartFile file:files){
-            String originalName = file.getOriginalFilename();
-            String fileName = originalName.substring(originalName.lastIndexOf("\\")+1);
-            log.info("originalName:" + originalName);
-            log.info("fileName: " + fileName);  //fileName == originalName
-            makeFolder(fileName);
+        long startTime = System.nanoTime();
+        /**시간 측정 시작**/
+        String originalName = file.getOriginalFilename();
+        //log.info("originalName:" + originalName);
+        String fileName = originalName.substring(originalName.lastIndexOf("\\")+1);
+        log.info("fileName: " + fileName);  //fileName == originalName
+        //makeFolder(fileName);
 
-            String uuid = UUID.randomUUID().toString();
-            String saveName = uploadPath + File.separator + uuid + "_" + fileName;
-            Path savePath = Paths.get(saveName);
+        String uuid = UUID.randomUUID().toString();
+        String saveName = uploadPath + File.separator + uuid + "_" + fileName;
+        //Path savePath = Paths.get(saveName);
 
-            try {
-                file.transferTo(savePath);
+        try {
+            //file.transferTo(savePath);
 
-                minioClient.putObject(PutObjectArgs.builder()
-                        .bucket(bucket)
-                        .object(file.getOriginalFilename())
-                        .stream(file.getInputStream(), file.getSize(), -1)
-                        .build());
-            } catch (ErrorResponseException e) {
-                throw new RuntimeException(e);
-            } catch (InsufficientDataException e) {
-                throw new RuntimeException(e);
-            } catch (InternalException e) {
-                throw new RuntimeException(e);
-            } catch (InvalidKeyException e) {
-                throw new RuntimeException(e);
-            } catch (InvalidResponseException e) {
-                throw new RuntimeException(e);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            } catch (NoSuchAlgorithmException e) {
-                throw new RuntimeException(e);
-            } catch (ServerException e) {
-                throw new RuntimeException(e);
-            } catch (XmlParserException e) {
-                throw new RuntimeException(e);
-            }
+            minioClient.putObject(PutObjectArgs.builder()
+                    .bucket(bucket)
+                    .object(file.getOriginalFilename())
+                    .stream(file.getInputStream(), file.getSize(), -1)
+                    .build());
+            /**시간 측정 끝**/
+            long endTime = System.nanoTime();
+            System.out.println("ElapsedTime " + (endTime - startTime));
+        } catch (ErrorResponseException e) {
+            throw new RuntimeException(e);
+        } catch (InsufficientDataException e) {
+            throw new RuntimeException(e);
+        } catch (InternalException e) {
+            throw new RuntimeException(e);
+        } catch (InvalidKeyException e) {
+            throw new RuntimeException(e);
+        } catch (InvalidResponseException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        } catch (ServerException e) {
+            throw new RuntimeException(e);
+        } catch (XmlParserException e) {
+            throw new RuntimeException(e);
         }
+        /*for(MultipartFile file:files){
+
+        }*/
+
+        return "index";
     }
 
     private void makeFolder(String fileName){
