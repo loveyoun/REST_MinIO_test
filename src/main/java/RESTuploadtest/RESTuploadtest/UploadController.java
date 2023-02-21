@@ -45,18 +45,22 @@ public class UploadController {
     public String uploadFile(@RequestParam("file") MultipartFile file){
         /*redirectAttributes.addFlashAttribute("message", "You successfully uploaded" + file.getOriginalFilename());
         return "redirect:/";*/
-        long startTime = System.nanoTime();
-        /**시간 측정 시작**/
-        String originalName = file.getOriginalFilename();
-        //log.info("originalName:" + originalName);
-        String fileName = originalName.substring(originalName.lastIndexOf("\\")+1);
-        log.info("fileName: " + fileName);  //fileName == originalName
+
+        /*String originalName = file.getOriginalFilename();
+        log.info("originalName:" + originalName);*/
+        String fileName = file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf("\\")+1);
+        //log.info("fileName: " + fileName);  //fileName == originalName
+
         //makeFolder(fileName);
 
         String uuid = UUID.randomUUID().toString();
         String saveName = uploadPath + File.separator + uuid + "_" + fileName;
         //Path savePath = Paths.get(saveName);
 
+        long startTime = System.nanoTime();
+        /**
+         * 시간 측정 시작
+         **/
         try {
             //file.transferTo(savePath);
 
@@ -65,7 +69,9 @@ public class UploadController {
                     .object(file.getOriginalFilename())
                     .stream(file.getInputStream(), file.getSize(), -1)
                     .build());
-            /**시간 측정 끝**/
+            /**
+             * 시간 측정 끝
+             **/
             long endTime = System.nanoTime();
             System.out.println("ElapsedTime " + (endTime - startTime));
         } catch (ErrorResponseException e) {
@@ -87,8 +93,8 @@ public class UploadController {
         } catch (XmlParserException e) {
             throw new RuntimeException(e);
         }
-        /*for(MultipartFile file:files){
 
+        /*for(MultipartFile file:files){
         }*/
 
         return "index";
